@@ -101,7 +101,7 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* ── TOP HUD ANGLED BORDER LINE (Calibrated) ── */}
+      {/* ── TOP HUD ANGLED BORDER LINE ── */}
       <div
         style={{
           position: "absolute",
@@ -135,7 +135,7 @@ export default function HeroSection() {
         </svg>
       </div>
 
-      {/* ── TOP NAVIGATION (Calibrated) ── */}
+      {/* ── TOP NAVIGATION ── */}
       <header
         style={{
           position: "relative",
@@ -237,7 +237,7 @@ export default function HeroSection() {
         </div>
       </header>
 
-      {/* ── MAIN HERO BODY (Left-aligned Layout) ── */}
+      {/* ── MAIN HERO BODY ── */}
       <main
         style={{
           position: "relative",
@@ -287,40 +287,24 @@ export default function HeroSection() {
             innovation.
           </p>
 
-          {/* Chamfered START NOW Button */}
+          {/* START NOW Button (Exact Dual Chamfered Cut: Top-Left & Bottom-Right) */}
           <div style={{ marginBottom: "40px" }}>
             <a
               href="#projects"
               id="hero-start-now-btn"
-              className="font-chakra"
+              className="wasp-btn font-chakra"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(10, 14, 20, 0.92)",
+                backgroundColor: "#0B0E14",
                 color: "#ffffff",
                 fontWeight: 700,
                 fontSize: "0.82rem",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                padding: "13px 32px",
-                clipPath:
-                  "polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%)",
-                border: "1px solid rgba(255, 255, 255, 0.25)",
+                padding: "14px 34px",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
                 textDecoration: "none",
                 cursor: "pointer",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-                backdropFilter: "blur(8px)",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
-                e.currentTarget.style.color = "#000000";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "rgba(10, 14, 20, 0.92)";
-                e.currentTarget.style.color = "#ffffff";
+                boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
               }}
             >
               START NOW

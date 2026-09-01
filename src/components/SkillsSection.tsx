@@ -285,7 +285,7 @@ export default function SkillsSection() {
             </p>
           </div>
 
-          {/* ── Category Filters (HUD Tab Style) ── */}
+          {/* ── Category Filters (Dual Chamfered Buttons) ── */}
           <div
             style={{
               display: "flex",
@@ -307,7 +307,7 @@ export default function SkillsSection() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className="font-chakra"
+                  className="wasp-btn font-chakra"
                   style={{
                     backgroundColor: active ? "#ffffff" : "rgba(255, 255, 255, 0.05)",
                     color: active ? "#000000" : "rgba(255, 255, 255, 0.75)",
@@ -315,24 +315,9 @@ export default function SkillsSection() {
                     fontSize: "12px",
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",
-                    padding: "9px 22px",
+                    padding: "9px 24px",
                     border: active ? "1px solid #ffffff" : "1px solid rgba(255, 255, 255, 0.15)",
-                    clipPath:
-                      "polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%)",
                     cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!active) {
-                      e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.12)";
-                      e.currentTarget.style.color = "#ffffff";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) {
-                      e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-                      e.currentTarget.style.color = "rgba(255, 255, 255, 0.75)";
-                    }
                   }}
                 >
                   {tab.label}
@@ -350,7 +335,7 @@ export default function SkillsSection() {
             gap: "24px",
           }}
         >
-          {filteredSkills.map((skill, index) => (
+          {filteredSkills.map((skill) => (
             <div
               key={skill.name}
               style={{
@@ -360,7 +345,7 @@ export default function SkillsSection() {
                 border: "1px solid rgba(255, 255, 255, 0.12)",
                 padding: "26px",
                 clipPath:
-                  "polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)",
+                  "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -384,7 +369,7 @@ export default function SkillsSection() {
                 style={{
                   position: "absolute",
                   top: "8px",
-                  left: "8px",
+                  left: "14px",
                   width: "8px",
                   height: "8px",
                   borderTop: "1px solid rgba(255, 255, 255, 0.4)",
@@ -565,29 +550,17 @@ export default function SkillsSection() {
 
           <a
             href="#contact"
-            className="font-chakra"
+            className="wasp-btn font-chakra"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
               backgroundColor: "#ffffff",
               color: "#000000",
               fontWeight: 700,
               fontSize: "12px",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              padding: "12px 28px",
-              clipPath:
-                "polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%)",
+              padding: "13px 32px",
               textDecoration: "none",
               cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#E5E7EB";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#ffffff";
             }}
           >
             DISCUSS A PROJECT →

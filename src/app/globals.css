@@ -18,20 +18,29 @@
   font-family: var(--font-inter), sans-serif;
 }
 
-/* ── Chamfered Tech Button (Exact WASP cut corner) ── */
-.chamfer-btn {
+/* ── Exact WASP Button: Dual Chamfered Corners (Top-Left & Bottom-Right) ── */
+.wasp-btn {
   clip-path: polygon(
-    0 0,
+    14px 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
-    0 100%
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    0 100%,
+    0 14px
   );
   position: relative;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.chamfer-btn:active {
+.wasp-btn:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.wasp-btn:active {
   transform: translateY(1px);
 }
 
