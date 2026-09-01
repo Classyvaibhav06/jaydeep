@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Chakra_Petch, Silkscreen, Inter } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const chakraPetch = Chakra_Petch({
@@ -37,7 +38,10 @@ export default function RootLayout({
       className={`${chakraPetch.variable} ${silkscreen.variable} ${inter.variable} h-full`}
     >
       <body className="min-h-full antialiased selection:bg-cyan-500 selection:text-black">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );
