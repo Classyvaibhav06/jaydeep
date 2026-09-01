@@ -155,41 +155,6 @@ export default function HeroSection() {
         )}
       </div>
 
-      {/* ── TOP HUD ANGLED BORDER LINE (Calibrated) ── */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "110px",
-          pointerEvents: "none",
-          zIndex: 10,
-        }}
-      >
-        <svg
-          style={{ width: "100%", height: "100%" }}
-          preserveAspectRatio="none"
-          viewBox="0 0 1440 110"
-        >
-          <path
-            d="M 0,48 L 44,48 L 80,82 L 720,82 L 2400,82"
-            fill="none"
-            stroke="var(--hud-line)"
-            strokeWidth={1.2}
-          />
-          <path
-            d="M 720,82 L 720,106"
-            fill="none"
-            stroke="var(--hud-line)"
-            strokeWidth={1.2}
-          />
-        </svg>
-      </div>
-
-      {/* Spacer for sticky Navbar */}
-      <div style={{ height: "80px", flexShrink: 0 }} />
-
       {/* ── MAIN HERO BODY (Left-aligned Layout) ── */}
       <main
         style={{
@@ -198,7 +163,7 @@ export default function HeroSection() {
           flex: 1,
           display: "flex",
           alignItems: "center",
-          padding: "0 56px",
+          padding: "120px 56px 40px 56px",
           maxWidth: "1480px",
           width: "100%",
           margin: "0 auto",
