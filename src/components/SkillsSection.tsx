@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { WaspButton } from "@/components/ui/wasp-button";
 
 interface SkillItem {
   name: string;
@@ -285,7 +286,7 @@ export default function SkillsSection() {
             </p>
           </div>
 
-          {/* ── Category Filters (Dual Chamfered Buttons) ── */}
+          {/* ── Category Filters (Calibrated 45-Degree Buttons) ── */}
           <div
             style={{
               display: "flex",
@@ -304,24 +305,18 @@ export default function SkillsSection() {
             ].map((tab) => {
               const active = activeTab === tab.id;
               return (
-                <button
+                <WaspButton
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
-                  className="wasp-btn font-chakra"
-                  style={{
-                    backgroundColor: active ? "#ffffff" : "rgba(255, 255, 255, 0.05)",
-                    color: active ? "#000000" : "rgba(255, 255, 255, 0.75)",
-                    fontWeight: 700,
-                    fontSize: "12px",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    padding: "9px 24px",
-                    border: active ? "1px solid #ffffff" : "1px solid rgba(255, 255, 255, 0.15)",
-                    cursor: "pointer",
-                  }}
+                  variant={active ? "light" : "dark"}
+                  paddingX={24}
+                  paddingY={10}
+                  fontSize={12}
+                  cutTopLeft={10}
+                  cutBottomRight={10}
                 >
                   {tab.label}
-                </button>
+                </WaspButton>
               );
             })}
           </div>
@@ -351,12 +346,12 @@ export default function SkillsSection() {
                 justifyContent: "space-between",
                 minHeight: "220px",
                 boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)",
-                transition: "all 0.25s ease",
+                transition: "border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.35)";
+                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.4)";
                 e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.backgroundColor = "rgba(20, 27, 40, 0.9)";
+                e.currentTarget.style.backgroundColor = "rgba(20, 27, 40, 0.92)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
@@ -548,23 +543,17 @@ export default function SkillsSection() {
             </div>
           </div>
 
-          <a
+          <WaspButton
             href="#contact"
-            className="wasp-btn font-chakra"
-            style={{
-              backgroundColor: "#ffffff",
-              color: "#000000",
-              fontWeight: 700,
-              fontSize: "12px",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              padding: "13px 32px",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
+            variant="light"
+            paddingX={32}
+            paddingY={13}
+            fontSize={12}
+            cutTopLeft={12}
+            cutBottomRight={12}
           >
             DISCUSS A PROJECT →
-          </a>
+          </WaspButton>
         </div>
       </div>
     </section>

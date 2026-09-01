@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { WaspButton } from "@/components/ui/wasp-button";
 
 export default function HeroSection() {
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
@@ -101,7 +102,7 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* ── TOP HUD ANGLED BORDER LINE ── */}
+      {/* ── TOP HUD ANGLED BORDER LINE (Calibrated) ── */}
       <div
         style={{
           position: "absolute",
@@ -135,7 +136,7 @@ export default function HeroSection() {
         </svg>
       </div>
 
-      {/* ── TOP NAVIGATION ── */}
+      {/* ── TOP NAVIGATION (Calibrated) ── */}
       <header
         style={{
           position: "relative",
@@ -237,7 +238,7 @@ export default function HeroSection() {
         </div>
       </header>
 
-      {/* ── MAIN HERO BODY ── */}
+      {/* ── MAIN HERO BODY (Left-aligned Layout) ── */}
       <main
         style={{
           position: "relative",
@@ -287,31 +288,14 @@ export default function HeroSection() {
             innovation.
           </p>
 
-          {/* START NOW Button (Exact Dual Chamfered Cut: Top-Left & Bottom-Right) */}
+          {/* Calibrated 45-Degree Cut Button */}
           <div style={{ marginBottom: "40px" }}>
-            <a
-              href="#projects"
-              id="hero-start-now-btn"
-              className="wasp-btn font-chakra"
-              style={{
-                backgroundColor: "#0B0E14",
-                color: "#ffffff",
-                fontWeight: 700,
-                fontSize: "0.82rem",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                padding: "14px 34px",
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                textDecoration: "none",
-                cursor: "pointer",
-                boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
-              }}
-            >
+            <WaspButton href="#skills" id="hero-start-now-btn">
               START NOW
-            </a>
+            </WaspButton>
           </div>
 
-          {/* Stats Section with Divider */}
+          {/* Wireframe Stats Section */}
           <div
             style={{
               paddingTop: "24px",
