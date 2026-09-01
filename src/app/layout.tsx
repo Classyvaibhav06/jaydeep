@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Chakra_Petch, Silkscreen, Inter } from "next/font/google";
+import { ThemeProvider } from "@/context/ThemeContext";
 import "./globals.css";
 
 const chakraPetch = Chakra_Petch({
@@ -21,8 +22,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "JAYDEEP — Full Stack Developer",
-  description: "AI-driven solutions and cutting-edge digital experiences.",
+  title: "JAYDEEP — Machine Learning & AI Systems Engineer",
+  description: "Architecting high-throughput neural models, autonomous LLM pipelines, and low-latency inference systems.",
 };
 
 export default function RootLayout({
@@ -35,8 +36,8 @@ export default function RootLayout({
       lang="en"
       className={`${chakraPetch.variable} ${silkscreen.variable} ${inter.variable} h-full`}
     >
-      <body className="min-h-full antialiased selection:bg-black selection:text-white">
-        {children}
+      <body className="min-h-full antialiased selection:bg-cyan-500 selection:text-black">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

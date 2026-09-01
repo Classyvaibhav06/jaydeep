@@ -6,6 +6,57 @@
   --font-inter: var(--font-inter);
 }
 
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #06090e;
+  --bg-card: rgba(15, 20, 30, 0.75);
+  --bg-card-hover: rgba(20, 27, 40, 0.92);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-muted: #9CA3AF;
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --border-active: rgba(255, 255, 255, 0.4);
+  --hud-line: rgba(255, 255, 255, 0.2);
+  --grid-line: rgba(255, 255, 255, 0.03);
+}
+
+html.light {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #EDF2F7;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: #ffffff;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-active: rgba(0, 0, 0, 0.35);
+  --hud-line: rgba(0, 0, 0, 0.18);
+  --grid-line: rgba(0, 0, 0, 0.04);
+}
+
+/* ── View Transitions API Smooth Circular Ripple ── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+.dark::view-transition-old(root) {
+  z-index: 9999;
+}
+
+.dark::view-transition-new(root) {
+  z-index: 1;
+}
+
 .font-chakra {
   font-family: var(--font-chakra), sans-serif;
 }
@@ -18,7 +69,7 @@
   font-family: var(--font-inter), sans-serif;
 }
 
-/* ── Exact WASP Button: Dual Chamfered Corners (Top-Left & Bottom-Right) ── */
+/* ── Exact WASP Button: Dual Chamfered Corners ── */
 .wasp-btn {
   clip-path: polygon(
     14px 0,
@@ -36,7 +87,7 @@
 }
 
 .wasp-btn:hover {
-  filter: brightness(1.2);
+  filter: brightness(1.15);
   transform: translateY(-1px);
 }
 
@@ -56,9 +107,10 @@
 html,
 body {
   height: 100%;
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ── Custom Scrollbar ── */
@@ -66,9 +118,12 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
   background: #333333;
   border-radius: 3px;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
 }

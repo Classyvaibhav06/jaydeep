@@ -4,127 +4,150 @@ import React, { useState } from "react";
 import { WaspButton } from "@/components/ui/wasp-button";
 
 interface SkillItem {
+  id: string;
   name: string;
-  level: string;
-  category: "frontend" | "backend" | "ai" | "devops";
-  icon: string;
-  desc: string;
+  level: number; // 0-100
+  category: "all" | "frontend" | "backend" | "ai" | "devops";
+  code: string;
+  tagline: string;
   tags: string[];
 }
 
-const SKILLS: SkillItem[] = [
-  // Frontend
+const SKILLS_DATA: SkillItem[] = [
+  // ── Frontend & UI ──
   {
-    name: "Next.js / React 19",
-    level: "95%",
+    id: "nextjs",
+    name: "Next.js 16 / React 19",
+    level: 95,
     category: "frontend",
-    icon: "▲",
-    desc: "Server components, streaming SSR, App Router & Turbopack architecture.",
-    tags: ["App Router", "SSR", "Server Actions"],
+    code: "UI-01 // CORE",
+    tagline: "Server Components, streaming SSR, App Router architecture.",
+    tags: ["React 19", "Server Actions", "Turbopack", "Hydration"],
   },
   {
-    name: "TypeScript",
-    level: "92%",
+    id: "typescript",
+    name: "TypeScript (Strict)",
+    level: 92,
     category: "frontend",
-    icon: "TS",
-    desc: "Strict type safety, generic design patterns, and enterprise codebases.",
-    tags: ["Generics", "Type Utilities", "AST"],
+    code: "TS-02 // TYPE",
+    tagline: "Generic inference, AST transforms, strict null safety.",
+    tags: ["Generics", "Type Guards", "Utility Types", "AST"],
   },
   {
-    name: "Tailwind CSS & Motion",
-    level: "96%",
+    id: "tailwind",
+    name: "Tailwind CSS v4 & Styling",
+    level: 96,
     category: "frontend",
-    icon: "◈",
-    desc: "Responsive design systems, micro-interactions & hardware-accelerated animations.",
-    tags: ["Tailwind v4", "Framer Motion", "GSAP"],
+    code: "CSS-03 // STYLE",
+    tagline: "Dynamic token systems, high-performance CSS animations.",
+    tags: ["Tailwind v4", "CSS Variables", "Responsive", "Tokens"],
   },
   {
-    name: "Three.js / WebGL",
-    level: "82%",
+    id: "framer",
+    name: "Framer Motion & Micro-UI",
+    level: 88,
     category: "frontend",
-    icon: "⬡",
-    desc: "Interactive 3D scene graphs, shaders, particle systems and camera controls.",
-    tags: ["R3F", "GLSL Shaders", "Meshes"],
+    code: "ANIM-04 // FX",
+    tagline: "Layout orchestration, springs, gesture-driven HUD components.",
+    tags: ["Layout Animations", "Gestures", "Springs", "SVG Paths"],
   },
 
-  // Backend
+  // ── AI & Intelligence ──
   {
-    name: "Node.js & Express",
-    level: "90%",
-    category: "backend",
-    icon: "⬢",
-    desc: "High-throughput asynchronous REST & WebSocket microservices.",
-    tags: ["REST", "WebSockets", "Streams"],
+    id: "pytorch",
+    name: "PyTorch & Deep Learning",
+    level: 94,
+    category: "ai",
+    code: "AI-01 // TENSOR",
+    tagline: "Transformer backbones, custom CUDA ops, distributed training.",
+    tags: ["TorchDynamo", "CUDA", "Multi-GPU", "FlashAttention"],
   },
   {
-    name: "PostgreSQL & Prisma",
-    level: "88%",
-    category: "backend",
-    icon: "◬",
-    desc: "Relational database modeling, query optimization, indexing, and ORM pipelines.",
-    tags: ["Prisma", "SQL", "Indexing"],
+    id: "vllm",
+    name: "vLLM & Inference Serving",
+    level: 92,
+    category: "ai",
+    code: "AI-02 // SERVE",
+    tagline: "PagedAttention, continuous batching, AWQ/GGUF quantization.",
+    tags: ["Continuous Batching", "PagedAttention", "AWQ", "Triton"],
   },
   {
-    name: "Redis & Caching",
-    level: "85%",
-    category: "backend",
-    icon: "⚡",
-    desc: "In-memory caching layers, pub/sub queues, and rate-limiting protocols.",
-    tags: ["Pub/Sub", "Sessions", "Rate Limiting"],
+    id: "langchain",
+    name: "LangChain & Multi-Agents",
+    level: 90,
+    category: "ai",
+    code: "AI-03 // AGENT",
+    tagline: "Hierarchical agent DAGs, semantic routing, tool reflection.",
+    tags: ["Agent Swarms", "Tool Calling", "Reflection", "DAGs"],
+  },
+  {
+    id: "tensorrt",
+    name: "TensorRT & Computer Vision",
+    level: 86,
+    category: "ai",
+    code: "AI-04 // VISION",
+    tagline: "Zero-shot YOLO segmentation, ONNX runtime, Jetson deployment.",
+    tags: ["YOLOv10", "SAM", "ONNX", "Edge AI"],
   },
 
-  // AI & Systems
+  // ── Backend & Data ──
   {
-    name: "AI & LLM Integration",
-    level: "92%",
-    category: "ai",
-    icon: "✦",
-    desc: "Custom agentic workflows, RAG pipelines, function calling & prompt tuning.",
-    tags: ["LangChain", "OpenAI / Claude", "Embeddings"],
+    id: "fastapi",
+    name: "FastAPI & Python Async",
+    level: 92,
+    category: "backend",
+    code: "API-01 // ASYNC",
+    tagline: "High-throughput asynchronous microservices, gRPC streaming.",
+    tags: ["AsyncIO", "Pydantic v2", "gRPC", "WebSockets"],
   },
   {
-    name: "Vector Databases",
-    level: "86%",
-    category: "ai",
-    icon: "◎",
-    desc: "Semantic search, high-dimensional cosine similarity indexing and retrieval.",
-    tags: ["Pinecone", "pgvector", "Chroma"],
+    id: "pgvector",
+    name: "pgvector & Qdrant (RAG)",
+    level: 90,
+    category: "backend",
+    code: "DATA-02 // VEC",
+    tagline: "Hybrid dense-sparse indexing, cross-encoder re-ranking.",
+    tags: ["HNSW", "Cosine Indexing", "ColBERT", "Hybrid RAG"],
   },
   {
-    name: "Python Automation",
-    level: "84%",
-    category: "ai",
-    icon: "Py",
-    desc: "Data processing scripts, scrapers, API hooks and automation tooling.",
-    tags: ["FastAPI", "Pandas", "Scikit"],
+    id: "redis",
+    name: "Redis Semantic Cache",
+    level: 88,
+    category: "backend",
+    code: "DATA-03 // CACHE",
+    tagline: "High-speed token buffer, Pub/Sub message broker.",
+    tags: ["Semantic Caching", "Pub/Sub", "In-Memory", "Low Latency"],
   },
 
-  // DevOps & Cloud
+  // ── DevOps & Cloud ──
   {
-    name: "Docker & Containerization",
-    level: "85%",
+    id: "docker-k8s",
+    name: "Docker & Kubernetes",
+    level: 89,
     category: "devops",
-    icon: "⎈",
-    desc: "Multi-stage builds, container isolation, and orchestration readiness.",
-    tags: ["Dockerfile", "Compose", "Registry"],
-  },
-  {
-    name: "CI/CD & Cloud Deploy",
-    level: "89%",
-    category: "devops",
-    icon: "☁",
-    desc: "Automated GitHub Actions pipelines, Vercel edge runtime, and AWS compute.",
-    tags: ["GitHub Actions", "Vercel", "AWS S3/EC2"],
+    code: "OPS-01 // CLOUD",
+    tagline: "Multi-node GPU orchestration, auto-scaling, Helm charts.",
+    tags: ["K8s", "GPU Operators", "Helm", "Multi-Cloud"],
   },
 ];
 
+const CATEGORIES = [
+  { id: "all", label: "ALL TECH" },
+  { id: "ai", label: "AI & INTELLIGENCE" },
+  { id: "frontend", label: "FRONTEND & UI" },
+  { id: "backend", label: "BACKEND & DATA" },
+  { id: "devops", label: "DEVOPS & CLOUD" },
+] as const;
+
 export default function SkillsSection() {
-  const [activeTab, setActiveTab] = useState<"all" | "frontend" | "backend" | "ai" | "devops">("all");
+  const [activeCategory, setActiveCategory] = useState<
+    "all" | "frontend" | "backend" | "ai" | "devops"
+  >("all");
 
   const filteredSkills =
-    activeTab === "all"
-      ? SKILLS
-      : SKILLS.filter((skill) => skill.category === activeTab);
+    activeCategory === "all"
+      ? SKILLS_DATA
+      : SKILLS_DATA.filter((s) => s.category === activeCategory);
 
   return (
     <section
@@ -132,12 +155,13 @@ export default function SkillsSection() {
       style={{
         width: "100%",
         minHeight: "100vh",
-        backgroundColor: "#06090E",
-        color: "#ffffff",
+        backgroundColor: "var(--bg-secondary)",
+        color: "var(--text-primary)",
         position: "relative",
         overflow: "hidden",
         padding: "100px 56px 120px 56px",
         userSelect: "none",
+        transition: "background-color 0.3s ease, color 0.3s ease",
       }}
     >
       {/* ── Background Cyber Grid & Glow ── */}
@@ -146,7 +170,7 @@ export default function SkillsSection() {
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)",
+            "linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)",
           backgroundSize: "40px 40px",
           pointerEvents: "none",
           zIndex: 0,
@@ -160,7 +184,8 @@ export default function SkillsSection() {
           transform: "translateX(-50%)",
           width: "700px",
           height: "400px",
-          background: "radial-gradient(circle, rgba(59, 130, 246, 0.07) 0%, transparent 70%)",
+          background:
+            "radial-gradient(circle, rgba(59, 130, 246, 0.07) 0%, transparent 70%)",
           pointerEvents: "none",
           zIndex: 0,
         }}
@@ -184,11 +209,10 @@ export default function SkillsSection() {
           viewBox="0 0 1440 60"
         >
           <path
-            d="M 0,10 L 80,10 L 120,40 L 720,40 L 1440,40"
+            d="M 0,20 L 160,20 L 200,48 L 840,48 L 1440,48"
             fill="none"
-            stroke="#ffffff"
-            strokeWidth="1.2"
-            opacity="0.2"
+            stroke="var(--hud-line)"
+            strokeWidth={1.2}
           />
         </svg>
       </div>
@@ -202,13 +226,7 @@ export default function SkillsSection() {
         }}
       >
         {/* ── Section Header ── */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginBottom: "50px",
-          }}
-        >
+        <div style={{ marginBottom: "48px" }}>
           {/* Status Tag */}
           <div
             style={{
@@ -233,7 +251,7 @@ export default function SkillsSection() {
               style={{
                 fontSize: "12px",
                 letterSpacing: "0.15em",
-                color: "#9CA3AF",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
               }}
             >
@@ -261,225 +279,206 @@ export default function SkillsSection() {
                   letterSpacing: "-0.02em",
                   lineHeight: 0.95,
                   textTransform: "uppercase",
-                  color: "#ffffff",
+                  color: "var(--text-primary)",
                   margin: 0,
                 }}
               >
-                <span style={{ display: "block" }}>CORE TECH &</span>
-                <span style={{ display: "block", color: "rgba(255, 255, 255, 0.75)" }}>
-                  CAPABILITIES
+                <span style={{ display: "block" }}>ENGINEERING &amp;</span>
+                <span style={{ display: "block", color: "var(--text-secondary)" }}>
+                  AI ARSENAL
                 </span>
               </h2>
             </div>
 
             <p
               style={{
-                color: "#9CA3AF",
+                color: "var(--text-muted)",
                 fontSize: "0.95rem",
                 lineHeight: 1.6,
-                maxWidth: "380px",
+                maxWidth: "420px",
                 margin: 0,
               }}
             >
-              engineered with cutting-edge toolchains, resilient architectures,
-              and performance-first paradigms.
+              Battle-tested toolchain spanning distributed deep learning,
+              multi-modal inference optimization, and modern reactive interfaces.
             </p>
           </div>
 
-          {/* ── Category Filters (Calibrated 45-Degree Buttons) ── */}
+          {/* ── Filter Tabs (Wasp Sci-Fi Buttons) ── */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               gap: "12px",
-              marginTop: "40px",
+              marginTop: "36px",
               flexWrap: "wrap",
             }}
           >
-            {[
-              { id: "all", label: "ALL TECH" },
-              { id: "frontend", label: "FRONTEND & UI" },
-              { id: "backend", label: "BACKEND & DATA" },
-              { id: "ai", label: "AI & INTELLIGENCE" },
-              { id: "devops", label: "DEVOPS & CLOUD" },
-            ].map((tab) => {
-              const active = activeTab === tab.id;
+            {CATEGORIES.map((cat) => {
+              const active = activeCategory === cat.id;
               return (
                 <WaspButton
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id as any)}
                   variant={active ? "light" : "dark"}
-                  paddingX={24}
+                  paddingX={22}
                   paddingY={10}
                   fontSize={12}
                   cutTopLeft={10}
                   cutBottomRight={10}
                 >
-                  {tab.label}
+                  {cat.label}
                 </WaspButton>
               );
             })}
           </div>
         </div>
 
-        {/* ── Skills Grid (Chamfered Sci-Fi Cards) ── */}
+        {/* ── Skills Grid ── */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-            gap: "24px",
+            gap: "20px",
           }}
         >
           {filteredSkills.map((skill) => (
             <div
-              key={skill.name}
+              key={skill.id}
               style={{
                 position: "relative",
-                backgroundColor: "rgba(15, 20, 30, 0.75)",
+                backgroundColor: "var(--bg-card)",
                 backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255, 255, 255, 0.12)",
-                padding: "26px",
+                border: "1px solid var(--border-subtle)",
+                padding: "24px 28px",
                 clipPath:
                   "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                minHeight: "220px",
+                minHeight: "190px",
                 boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5)",
-                transition: "border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease",
+                transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.4)";
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.backgroundColor = "rgba(20, 27, 40, 0.92)";
+                e.currentTarget.style.borderColor = "var(--border-active)";
+                e.currentTarget.style.transform = "translateY(-3px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)";
+                e.currentTarget.style.borderColor = "var(--border-subtle)";
                 e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.backgroundColor = "rgba(15, 20, 30, 0.75)";
               }}
             >
               {/* Corner Bracket Accents */}
               <div
                 style={{
                   position: "absolute",
-                  top: "8px",
+                  top: "6px",
                   left: "14px",
                   width: "8px",
                   height: "8px",
-                  borderTop: "1px solid rgba(255, 255, 255, 0.4)",
-                  borderLeft: "1px solid rgba(255, 255, 255, 0.4)",
+                  borderTop: "1.5px solid var(--border-active)",
+                  borderLeft: "1.5px solid var(--border-active)",
                   pointerEvents: "none",
                 }}
               />
               <div
                 style={{
                   position: "absolute",
-                  top: "8px",
-                  right: "8px",
+                  top: "6px",
+                  right: "6px",
                   width: "8px",
                   height: "8px",
-                  borderTop: "1px solid rgba(255, 255, 255, 0.4)",
-                  borderRight: "1px solid rgba(255, 255, 255, 0.4)",
+                  borderTop: "1.5px solid var(--border-active)",
+                  borderRight: "1.5px solid var(--border-active)",
                   pointerEvents: "none",
                 }}
               />
 
-              {/* Top Header inside Card */}
+              {/* Card Header: Code & Mastery Level */}
               <div>
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: "14px",
+                    marginBottom: "8px",
                   }}
                 >
-                  <div
+                  <span
+                    className="font-pixel"
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
+                      fontSize: "10px",
+                      color: "var(--text-muted)",
+                      letterSpacing: "0.1em",
                     }}
                   >
-                    <span
-                      style={{
-                        width: "32px",
-                        height: "32px",
-                        backgroundColor: "rgba(255, 255, 255, 0.08)",
-                        border: "1px solid rgba(255, 255, 255, 0.18)",
-                        borderRadius: "4px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        color: "#ffffff",
-                      }}
-                    >
-                      {skill.icon}
-                    </span>
-                    <span
-                      className="font-chakra"
-                      style={{
-                        fontSize: "1.2rem",
-                        fontWeight: 700,
-                        color: "#ffffff",
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {skill.name}
-                    </span>
-                  </div>
-
+                    {skill.code}
+                  </span>
                   <span
                     className="font-chakra"
                     style={{
-                      fontSize: "1.1rem",
+                      fontSize: "13px",
                       fontWeight: 700,
-                      color: "rgba(255, 255, 255, 0.9)",
+                      color: "#38BDF8",
                     }}
                   >
-                    {skill.level}
+                    {skill.level}%
                   </span>
                 </div>
 
+                {/* Skill Name */}
+                <h3
+                  className="font-chakra"
+                  style={{
+                    fontSize: "1.25rem",
+                    fontWeight: 700,
+                    color: "var(--text-primary)",
+                    letterSpacing: "-0.01em",
+                    margin: "0 0 6px 0",
+                  }}
+                >
+                  {skill.name}
+                </h3>
+
+                {/* Tagline */}
                 <p
                   style={{
                     fontSize: "0.85rem",
-                    color: "rgba(255, 255, 255, 0.65)",
-                    lineHeight: 1.5,
-                    margin: "0 0 18px 0",
+                    color: "var(--text-secondary)",
+                    lineHeight: 1.4,
+                    margin: "0 0 16px 0",
                   }}
                 >
-                  {skill.desc}
+                  {skill.tagline}
                 </p>
               </div>
 
-              {/* Bottom: Progress Bar & Tag Pills */}
+              {/* Card Footer: Progress Bar + Tags */}
               <div>
-                {/* Tech Progress Bar */}
+                {/* Visual Level Progress Bar */}
                 <div
                   style={{
                     width: "100%",
                     height: "3px",
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    marginBottom: "14px",
-                    position: "relative",
+                    backgroundColor: "rgba(128, 128, 128, 0.2)",
+                    borderRadius: "2px",
                     overflow: "hidden",
+                    marginBottom: "14px",
                   }}
                 >
                   <div
                     style={{
-                      width: skill.level,
+                      width: `${skill.level}%`,
                       height: "100%",
-                      backgroundColor: "#ffffff",
-                      boxShadow: "0 0 8px rgba(255, 255, 255, 0.8)",
+                      backgroundColor: "#38BDF8",
+                      boxShadow: "0 0 8px #38BDF8",
+                      borderRadius: "2px",
                     }}
                   />
                 </div>
 
-                {/* Sub Tags */}
+                {/* Tags Pill Row */}
                 <div
                   style={{
                     display: "flex",
@@ -493,12 +492,12 @@ export default function SkillsSection() {
                       style={{
                         fontSize: "10px",
                         fontWeight: 500,
-                        color: "rgba(255, 255, 255, 0.7)",
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
-                        padding: "3px 8px",
+                        color: "var(--text-muted)",
+                        backgroundColor: "rgba(128, 128, 128, 0.08)",
+                        padding: "2px 6px",
                         borderRadius: "2px",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        letterSpacing: "0.03em",
+                        border: "1px solid var(--border-subtle)",
+                        letterSpacing: "0.02em",
                       }}
                     >
                       {tag}
@@ -508,52 +507,6 @@ export default function SkillsSection() {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* ── Bottom Section Stats Summary Bar ── */}
-        <div
-          style={{
-            marginTop: "60px",
-            paddingTop: "32px",
-            borderTop: "1px solid rgba(255, 255, 255, 0.15)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "24px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "40px", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span className="font-chakra" style={{ fontSize: "1.8rem", fontWeight: 700, color: "#fff" }}>
-                12+
-              </span>
-              <span style={{ fontSize: "11px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Core Frameworks & Tools
-              </span>
-            </div>
-            <div style={{ width: "1px", height: "30px", backgroundColor: "rgba(255,255,255,0.15)" }} />
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span className="font-chakra" style={{ fontSize: "1.8rem", fontWeight: 700, color: "#fff" }}>
-                99.9%
-              </span>
-              <span style={{ fontSize: "11px", color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                Performance & Reliability
-              </span>
-            </div>
-          </div>
-
-          <WaspButton
-            href="#contact"
-            variant="light"
-            paddingX={32}
-            paddingY={13}
-            fontSize={12}
-            cutTopLeft={12}
-            cutBottomRight={12}
-          >
-            DISCUSS A PROJECT →
-          </WaspButton>
         </div>
       </div>
     </section>

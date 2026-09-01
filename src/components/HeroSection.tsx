@@ -1,20 +1,34 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { WaspButton } from "@/components/ui/wasp-button";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function HeroSection() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const desktopVideoRef = useRef<HTMLVideoElement>(null);
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const [videoSrcError, setVideoSrcError] = useState(false);
 
   useEffect(() => {
+    setVideoSrcError(false);
     if (desktopVideoRef.current) {
+      desktopVideoRef.current.load();
       desktopVideoRef.current.play().catch(() => {});
     }
     if (mobileVideoRef.current) {
+      mobileVideoRef.current.load();
       mobileVideoRef.current.play().catch(() => {});
     }
-  }, []);
+  }, [theme]);
+
+  // Video sources (uses /light.mp4 in light mode, /desktop.mp4 / /bcck.mp4 in dark mode)
+  const desktopSrc =
+    !isDark && !videoSrcError ? "/light.mp4" : "/desktop.mp4";
+  const mobileSrc =
+    !isDark && !videoSrcError ? "/light.mp4" : "/bcck.mp4";
 
   return (
     <section
@@ -22,17 +36,18 @@ export default function HeroSection() {
         width: "100%",
         height: "100vh",
         minHeight: "640px",
-        backgroundColor: "#000000",
-        color: "#ffffff",
+        backgroundColor: "var(--bg-primary)",
+        color: "var(--text-primary)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         position: "relative",
         overflow: "hidden",
         userSelect: "none",
+        transition: "background-color 0.3s ease, color 0.3s ease",
       }}
     >
-      {/* ── FULL-SCREEN BACKGROUND VIDEO ── */}
+      {/* ── FULL-SCREEN BACKGROUND VIDEO LAYER ── */}
       <div
         style={{
           position: "absolute",
@@ -45,6 +60,7 @@ export default function HeroSection() {
       >
         {/* Desktop Video (>= 768px) */}
         <video
+          key={`desktop-${theme}-${desktopSrc}`}
           ref={desktopVideoRef}
           className="hidden md:block"
           style={{
@@ -53,17 +69,24 @@ export default function HeroSection() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            filter: isDark ? "none" : "brightness(1.05) contrast(0.95)",
+            transition: "filter 0.4s ease",
           }}
-          src="/desktop.mp4"
+          src={desktopSrc}
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
+          onError={() => {
+            // Graceful fallback to dark video if light video asset is not yet added
+            if (!isDark) setVideoSrcError(true);
+          }}
         />
 
         {/* Mobile Video (< 768px) */}
         <video
+          key={`mobile-${theme}-${mobileSrc}`}
           ref={mobileVideoRef}
           className="block md:hidden"
           style={{
@@ -72,34 +95,64 @@ export default function HeroSection() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            filter: isDark ? "none" : "brightness(1.05) contrast(0.95)",
+            transition: "filter 0.4s ease",
           }}
-          src="/bcck.mp4"
+          src={mobileSrc}
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
+          onError={() => {
+            if (!isDark) setVideoSrcError(true);
+          }}
         />
 
-        {/* Contrast Film Overlays */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.1) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 40%, rgba(0,0,0,0.4) 100%)",
-            pointerEvents: "none",
-          }}
-        />
+        {/* Dynamic Dark / Light Contrast Film Overlays */}
+        {isDark ? (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.1) 100%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 40%, rgba(0,0,0,0.4) 100%)",
+                pointerEvents: "none",
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to right, rgba(248, 250, 252, 0.92) 0%, rgba(248, 250, 252, 0.72) 48%, rgba(248, 250, 252, 0.25) 100%)",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to top, rgba(248, 250, 252, 0.9) 0%, transparent 45%, rgba(248, 250, 252, 0.5) 100%)",
+                pointerEvents: "none",
+              }}
+            />
+          </>
+        )}
       </div>
 
       {/* ── TOP HUD ANGLED BORDER LINE (Calibrated) ── */}
@@ -120,123 +173,22 @@ export default function HeroSection() {
           viewBox="0 0 1440 110"
         >
           <path
-            d="M 0,38 L 44,38 L 80,72 L 720,72 L 2400,72"
+            d="M 0,48 L 44,48 L 80,82 L 720,82 L 2400,82"
             fill="none"
-            stroke="#ffffff"
+            stroke="var(--hud-line)"
             strokeWidth={1.2}
-            opacity={0.35}
           />
           <path
-            d="M 720,72 L 720,96"
+            d="M 720,82 L 720,106"
             fill="none"
-            stroke="#ffffff"
+            stroke="var(--hud-line)"
             strokeWidth={1.2}
-            opacity={0.35}
           />
         </svg>
       </div>
 
-      {/* ── TOP NAVIGATION (Calibrated) ── */}
-      <header
-        style={{
-          position: "relative",
-          zIndex: 30,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "24px 56px 8px 56px",
-          flexShrink: 0,
-        }}
-      >
-        {/* Pixel Art Logo */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            transform: "translate(36px, -11px)",
-          }}
-        >
-          <a
-            href="#"
-            className="font-pixel"
-            style={{
-              fontSize: "28px",
-              letterSpacing: "0.14em",
-              color: "#ffffff",
-              textDecoration: "none",
-            }}
-          >
-            JAYDEEP
-          </a>
-        </div>
-
-        {/* Center Nav Links */}
-        <nav
-          className="hidden md:flex"
-          style={{
-            alignItems: "center",
-            gap: "96px",
-            fontSize: "15px",
-            fontWeight: 500,
-            color: "rgba(255, 255, 255, 0.98)",
-            transform: "translateY(-12px)",
-          }}
-        >
-          {["About", "Products", "Plans", "Contact"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              style={{
-                color: "rgba(255, 255, 255, 0.98)",
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "rgba(255, 255, 255, 0.98)")
-              }
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-
-        {/* CONNECT Button */}
-        <div
-          style={{
-            transform: "translate(0px, -9px)",
-          }}
-        >
-          <a
-            href="#contact"
-            id="nav-connect-btn"
-            style={{
-              display: "inline-block",
-              backgroundColor: "#ffffff",
-              color: "#000000",
-              fontWeight: 700,
-              fontSize: "13px",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              padding: "11px 35px",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.3)",
-              border: "1px solid #ffffff",
-              textDecoration: "none",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#000000";
-              e.currentTarget.style.color = "#ffffff";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#ffffff";
-              e.currentTarget.style.color = "#000000";
-            }}
-          >
-            CONNECT
-          </a>
-        </div>
-      </header>
+      {/* Spacer for sticky Navbar */}
+      <div style={{ height: "80px", flexShrink: 0 }} />
 
       {/* ── MAIN HERO BODY (Left-aligned Layout) ── */}
       <main
@@ -253,45 +205,50 @@ export default function HeroSection() {
           minHeight: 0,
         }}
       >
-        <div style={{ maxWidth: "600px", width: "100%" }}>
+        <div style={{ maxWidth: "620px", width: "100%" }}>
           {/* Main Headline */}
           <h1
             className="font-chakra"
             style={{
               fontWeight: 700,
-              color: "#ffffff",
-              fontSize: "clamp(2.8rem, 5.5vw, 4.4rem)",
+              color: "var(--text-primary)",
+              fontSize: "clamp(2.6rem, 5.2vw, 4.2rem)",
               letterSpacing: "-0.02em",
               lineHeight: 0.94,
               textTransform: "uppercase",
               margin: "0 0 18px 0",
-              textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+              textShadow: isDark
+                ? "0 2px 10px rgba(0,0,0,0.5)"
+                : "0 2px 10px rgba(255,255,255,0.8)",
             }}
           >
-            <span style={{ display: "block" }}>AI DRIVEN</span>
-            <span style={{ display: "block" }}>SOLUTIONS</span>
+            <span style={{ display: "block" }}>MACHINE LEARNING</span>
+            <span style={{ display: "block" }}>&amp; AI SYSTEMS</span>
           </h1>
 
           {/* Subtitle */}
           <p
             style={{
-              color: "rgba(255, 255, 255, 0.8)",
+              color: "var(--text-secondary)",
               fontSize: "0.95rem",
               lineHeight: 1.6,
-              maxWidth: "360px",
+              maxWidth: "420px",
               margin: "0 0 32px 0",
               fontWeight: 400,
-              textShadow: "0 1px 6px rgba(0,0,0,0.6)",
             }}
           >
-            transforms your challenges into opportunities with cutting-edge
-            innovation.
+            Architecting high-throughput neural models, autonomous LLM pipelines,
+            and ultra-low-latency distributed inference engines.
           </p>
 
           {/* Calibrated 45-Degree Cut Button */}
           <div style={{ marginBottom: "40px" }}>
-            <WaspButton href="#skills" id="hero-start-now-btn">
-              START NOW
+            <WaspButton
+              href="#skills"
+              id="hero-start-now-btn"
+              variant={isDark ? "dark" : "light"}
+            >
+              EXPLORE MODELS
             </WaspButton>
           </div>
 
@@ -299,14 +256,14 @@ export default function HeroSection() {
           <div
             style={{
               paddingTop: "24px",
-              borderTop: "1px solid rgba(255, 255, 255, 0.22)",
+              borderTop: "1px solid var(--border-subtle)",
               display: "flex",
               alignItems: "center",
               gap: "42px",
-              maxWidth: "440px",
+              maxWidth: "460px",
             }}
           >
-            {/* Stat 1: Active Users */}
+            {/* Stat 1: Daily Inferences / Token Throughput */}
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
               <div
                 style={{
@@ -315,7 +272,7 @@ export default function HeroSection() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "rgba(255, 255, 255, 0.75)",
+                  color: "var(--text-secondary)",
                   flexShrink: 0,
                 }}
               >
@@ -339,23 +296,22 @@ export default function HeroSection() {
                   style={{
                     fontWeight: 700,
                     fontSize: "1.6rem",
-                    color: "#ffffff",
+                    color: "var(--text-primary)",
                     lineHeight: 1,
-                    textShadow: "0 2px 8px rgba(0,0,0,0.5)",
                   }}
                 >
-                  30M
+                  25M+
                 </div>
                 <div
                   style={{
                     fontSize: "11px",
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "var(--text-muted)",
                     marginTop: "4px",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
                 >
-                  active users
+                  Daily Inferences
                 </div>
               </div>
             </div>
@@ -365,11 +321,11 @@ export default function HeroSection() {
               style={{
                 height: "36px",
                 width: "1px",
-                backgroundColor: "rgba(255, 255, 255, 0.25)",
+                backgroundColor: "var(--border-subtle)",
               }}
             />
 
-            {/* Stat 2: Country Served */}
+            {/* Stat 2: Latency Benchmark */}
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
               <div
                 style={{
@@ -378,7 +334,7 @@ export default function HeroSection() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "rgba(255, 255, 255, 0.75)",
+                  color: "var(--text-secondary)",
                   flexShrink: 0,
                 }}
               >
@@ -403,23 +359,22 @@ export default function HeroSection() {
                   style={{
                     fontWeight: 700,
                     fontSize: "1.6rem",
-                    color: "#ffffff",
+                    color: "var(--text-primary)",
                     lineHeight: 1,
-                    textShadow: "0 2px 8px rgba(0,0,0,0.5)",
                   }}
                 >
-                  56
+                  &lt; 38ms
                 </div>
                 <div
                   style={{
                     fontSize: "11px",
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "var(--text-muted)",
                     marginTop: "4px",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
                 >
-                  country served
+                  P99 Inference Latency
                 </div>
               </div>
             </div>
@@ -434,8 +389,9 @@ export default function HeroSection() {
           zIndex: 20,
           width: "100%",
           height: "64px",
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2) 60%, transparent)",
+          background: isDark
+            ? "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2) 60%, transparent)"
+            : "linear-gradient(to top, rgba(248,250,252,0.9), rgba(248,250,252,0.3) 60%, transparent)",
           pointerEvents: "none",
           flexShrink: 0,
         }}
