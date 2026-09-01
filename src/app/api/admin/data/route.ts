@@ -19,9 +19,9 @@ export async function GET() {
     const sql = getDb();
 
     const config = await sql`SELECT * FROM portfolio_config WHERE id = 'main'`;
-    const skills = await sql`SELECT * FROM skills ORDER BY sort_order ASC, created_at DESC`;
-    const projects = await sql`SELECT * FROM projects ORDER BY sort_order ASC, created_at DESC`;
-    const experiences = await sql`SELECT * FROM experiences ORDER BY sort_order ASC, created_at DESC`;
+    const skills = await sql`SELECT * FROM skills ORDER BY sort_order ASC, updated_at DESC`;
+    const projects = await sql`SELECT * FROM projects ORDER BY sort_order ASC, updated_at DESC`;
+    const experiences = await sql`SELECT * FROM experiences ORDER BY sort_order ASC, updated_at DESC`;
     const inquiries = await sql`SELECT * FROM inquiries ORDER BY created_at DESC LIMIT 50`;
 
     return NextResponse.json({
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     await initDb();
     const sql = getDb();
     const body = await req.json();
-    const { action, table, data, id } = body;
+    const { action, data, id } = body;
 
     if (action === "update_config") {
       await sql`
@@ -80,18 +80,25 @@ export async function POST(req: Request) {
     }
 
     if (action === "upsert_skill") {
+      const skillId = data.id || data.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const tagsArray = Array.isArray(data.tags)
+        ? data.tags
+        : typeof data.tags === "string"
+        ? data.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+        : [];
+
       await sql`
         INSERT INTO skills (
           id, name, level, category, code, tagline, tags, sort_order, updated_at
         ) VALUES (
-          ${data.id},
+          ${skillId},
           ${data.name},
-          ${data.level},
-          ${data.category},
-          ${data.code},
-          ${data.tagline},
-          ${JSON.stringify(data.tags)},
-          ${data.sort_order || 0},
+          ${parseInt(data.level) || 85},
+          ${data.category || "ai"},
+          ${data.code || "SKILL-01"},
+          ${data.tagline || ""},
+          ${JSON.stringify(tagsArray)},
+          ${parseInt(data.sort_order) || 0},
           NOW()
         )
         ON CONFLICT (id) DO UPDATE SET
@@ -113,24 +120,37 @@ export async function POST(req: Request) {
     }
 
     if (action === "upsert_project") {
+      const projId = data.id || data.title.toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const archArray = Array.isArray(data.architecture)
+        ? data.architecture
+        : typeof data.architecture === "string"
+        ? data.architecture.split("\n").map((t: string) => t.trim()).filter(Boolean)
+        : [];
+      const tagsArray = Array.isArray(data.tags)
+        ? data.tags
+        : typeof data.tags === "string"
+        ? data.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+        : [];
+      const metricsArray = Array.isArray(data.metrics) ? data.metrics : [];
+
       await sql`
         INSERT INTO projects (
           id, title, codename, category, tagline, description,
           architecture, metrics, tags, github_url, live_url, featured, sort_order, updated_at
         ) VALUES (
-          ${data.id},
+          ${projId},
           ${data.title},
-          ${data.codename},
-          ${data.category},
-          ${data.tagline},
-          ${data.description},
-          ${JSON.stringify(data.architecture)},
-          ${JSON.stringify(data.metrics)},
-          ${JSON.stringify(data.tags)},
+          ${data.codename || "SYS // CORE"},
+          ${data.category || "llm"},
+          ${data.tagline || ""},
+          ${data.description || ""},
+          ${JSON.stringify(archArray)},
+          ${JSON.stringify(metricsArray)},
+          ${JSON.stringify(tagsArray)},
           ${data.github_url || null},
           ${data.live_url || null},
           ${data.featured || false},
-          ${data.sort_order || 0},
+          ${parseInt(data.sort_order) || 0},
           NOW()
         )
         ON CONFLICT (id) DO UPDATE SET
@@ -157,21 +177,33 @@ export async function POST(req: Request) {
     }
 
     if (action === "upsert_experience") {
+      const expId = data.id || data.role.toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const achArray = Array.isArray(data.achievements)
+        ? data.achievements
+        : typeof data.achievements === "string"
+        ? data.achievements.split("\n").map((t: string) => t.trim()).filter(Boolean)
+        : [];
+      const techArray = Array.isArray(data.technologies)
+        ? data.technologies
+        : typeof data.technologies === "string"
+        ? data.technologies.split(",").map((t: string) => t.trim()).filter(Boolean)
+        : [];
+
       await sql`
         INSERT INTO experiences (
           id, role, company, location, period, badge, overview,
           achievements, technologies, sort_order, updated_at
         ) VALUES (
-          ${data.id},
+          ${expId},
           ${data.role},
           ${data.company},
-          ${data.location},
-          ${data.period},
-          ${data.badge},
-          ${data.overview},
-          ${JSON.stringify(data.achievements)},
-          ${JSON.stringify(data.technologies)},
-          ${data.sort_order || 0},
+          ${data.location || "Remote"},
+          ${data.period || "2024 — PRESENT"},
+          ${data.badge || "ACTIVE"},
+          ${data.overview || ""},
+          ${JSON.stringify(achArray)},
+          ${JSON.stringify(techArray)},
+          ${parseInt(data.sort_order) || 0},
           NOW()
         )
         ON CONFLICT (id) DO UPDATE SET

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { WaspButton } from "@/components/ui/wasp-button";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -31,6 +30,11 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [experiences, setExperiences] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
+
+  // Editing modals / state
+  const [editingSkill, setEditingSkill] = useState<any | null>(null);
+  const [editingProject, setEditingProject] = useState<any | null>(null);
+  const [editingExp, setEditingExp] = useState<any | null>(null);
 
   // Check auth status on mount
   useEffect(() => {
@@ -95,9 +99,15 @@ export default function AdminPage() {
     }
   };
 
+  const showNotification = (msg: string) => {
+    setSaveStatus(msg);
+    setTimeout(() => setSaveStatus(null), 3500);
+  };
+
+  // ── Save Hero Config ──
   const handleSaveConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveStatus("Saving config to Neon DB...");
+    showNotification("Saving config to Neon DB...");
     try {
       const res = await fetch("/api/admin/data", {
         method: "POST",
@@ -108,11 +118,136 @@ export default function AdminPage() {
         }),
       });
       if (res.ok) {
-        setSaveStatus("Config saved successfully!");
-        setTimeout(() => setSaveStatus(null), 3000);
+        showNotification("✓ Hero config saved to Neon DB!");
       }
     } catch {
-      setSaveStatus("Failed to save config");
+      showNotification("Failed to save config");
+    }
+  };
+
+  // ── Skill Actions ──
+  const handleSaveSkill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSkill) return;
+    showNotification("Saving skill to Neon DB...");
+    try {
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "upsert_skill",
+          data: editingSkill,
+        }),
+      });
+      if (res.ok) {
+        showNotification("✓ Skill updated successfully!");
+        setEditingSkill(null);
+        fetchData();
+      }
+    } catch {
+      showNotification("Failed to save skill");
+    }
+  };
+
+  const handleDeleteSkill = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this skill?")) return;
+    showNotification("Deleting skill...");
+    try {
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_skill", id }),
+      });
+      if (res.ok) {
+        showNotification("✓ Skill deleted");
+        fetchData();
+      }
+    } catch {
+      showNotification("Failed to delete skill");
+    }
+  };
+
+  // ── Project Actions ──
+  const handleSaveProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    showNotification("Saving project to Neon DB...");
+    try {
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "upsert_project",
+          data: editingProject,
+        }),
+      });
+      if (res.ok) {
+        showNotification("✓ Project saved to Neon DB!");
+        setEditingProject(null);
+        fetchData();
+      }
+    } catch {
+      showNotification("Failed to save project");
+    }
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this project?")) return;
+    showNotification("Deleting project...");
+    try {
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_project", id }),
+      });
+      if (res.ok) {
+        showNotification("✓ Project deleted");
+        fetchData();
+      }
+    } catch {
+      showNotification("Failed to delete project");
+    }
+  };
+
+  // ── Experience Actions ──
+  const handleSaveExperience = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingExp) return;
+    showNotification("Saving experience to Neon DB...");
+    try {
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "upsert_experience",
+          data: editingExp,
+        }),
+      });
+      if (res.ok) {
+        showNotification("✓ Experience milestone saved!");
+        setEditingExp(null);
+        fetchData();
+      }
+    } catch {
+      showNotification("Failed to save experience");
+    }
+  };
+
+  const handleDeleteExperience = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this experience?")) return;
+    showNotification("Deleting experience...");
+    try {
+      const res = await fetch("/api/admin/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete_experience", id }),
+      });
+      if (res.ok) {
+        showNotification("✓ Experience deleted");
+        fetchData();
+      }
+    } catch {
+      showNotification("Failed to delete experience");
     }
   };
 
@@ -136,7 +271,7 @@ export default function AdminPage() {
           style={{
             maxWidth: "420px",
             width: "100%",
-            backgroundColor: "rgba(10, 16, 26, 0.9)",
+            backgroundColor: "rgba(10, 16, 26, 0.95)",
             border: "1px solid rgba(255, 255, 255, 0.15)",
             padding: "36px",
             clipPath:
@@ -296,6 +431,12 @@ export default function AdminPage() {
           >
             ● NEON DB SYNCED
           </span>
+
+          {saveStatus && (
+            <span style={{ fontSize: "12px", color: "#38BDF8", fontWeight: 600 }}>
+              {saveStatus}
+            </span>
+          )}
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -344,9 +485,9 @@ export default function AdminPage() {
       >
         {[
           { id: "config", label: "⚡ HERO & TELEMETRY" },
-          { id: "skills", label: "🛠️ SKILLS MATRIX" },
-          { id: "projects", label: "🚀 PROJECTS" },
-          { id: "experiences", label: "📈 CAREER TRACK" },
+          { id: "skills", label: `🛠️ SKILLS MATRIX (${skills.length})` },
+          { id: "projects", label: `🚀 PROJECTS (${projects.length})` },
+          { id: "experiences", label: `📈 CAREER TRACK (${experiences.length})` },
           { id: "inquiries", label: `📬 INBOX (${inquiries.length})` },
         ].map((tab) => (
           <button
@@ -375,7 +516,7 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Tab Content: Hero & General Config */}
+      {/* ── TAB 1: HERO & GENERAL CONFIG ── */}
       {activeTab === "config" && (
         <div
           style={{
@@ -517,7 +658,7 @@ export default function AdminPage() {
                 style={{
                   backgroundColor: "#ffffff",
                   color: "#000000",
-                  padding: "10px 20px",
+                  padding: "10px 24px",
                   borderRadius: "4px",
                   fontSize: "11px",
                   fontWeight: 700,
@@ -525,18 +666,650 @@ export default function AdminPage() {
                   border: "none",
                 }}
               >
-                SAVE CHANGES TO NEON DB →
+                SAVE TO NEON DB →
               </button>
-
-              {saveStatus && (
-                <span style={{ fontSize: "12px", color: "#10B981" }}>{saveStatus}</span>
-              )}
             </div>
           </form>
         </div>
       )}
 
-      {/* Tab Content: Inbox / Transmission Logs */}
+      {/* ── TAB 2: SKILLS MATRIX ── */}
+      {activeTab === "skills" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div>
+              <h2 className="font-chakra" style={{ fontSize: "1.4rem", margin: "0 0 4px 0" }}>
+                TECHNICAL ARSENAL MANAGEMENT
+              </h2>
+              <p style={{ color: "#9CA3AF", fontSize: "13px", margin: 0 }}>
+                Manage skills, proficiency percentages, and category groupings.
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                setEditingSkill({
+                  id: "",
+                  name: "",
+                  level: 90,
+                  category: "ai",
+                  code: "AI-NEW // TECH",
+                  tagline: "",
+                  tags: "PyTorch, CUDA",
+                  sort_order: skills.length + 1,
+                })
+              }
+              className="font-pixel"
+              style={{
+                backgroundColor: "#38BDF8",
+                color: "#000000",
+                padding: "8px 16px",
+                borderRadius: "4px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                border: "none",
+              }}
+            >
+              + ADD NEW SKILL
+            </button>
+          </div>
+
+          {/* Skill Edit / Create Modal Form */}
+          {editingSkill && (
+            <div
+              style={{
+                backgroundColor: "rgba(14, 22, 36, 0.95)",
+                border: "1px solid #38BDF8",
+                borderRadius: "6px",
+                padding: "24px",
+                marginBottom: "28px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.7)",
+              }}
+            >
+              <h3 className="font-chakra" style={{ fontSize: "1.2rem", marginBottom: "16px", color: "#38BDF8" }}>
+                {editingSkill.id ? "EDIT SKILL" : "CREATE NEW SKILL"}
+              </h3>
+              <form onSubmit={handleSaveSkill} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Skill Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editingSkill.name}
+                    onChange={(e) => setEditingSkill({ ...editingSkill, name: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Proficiency ({editingSkill.level}%)
+                  </label>
+                  <input
+                    type="range"
+                    min={1}
+                    max={100}
+                    value={editingSkill.level}
+                    onChange={(e) => setEditingSkill({ ...editingSkill, level: Number(e.target.value) })}
+                    style={{ width: "100%", accentColor: "#38BDF8" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Category
+                  </label>
+                  <select
+                    value={editingSkill.category}
+                    onChange={(e) => setEditingSkill({ ...editingSkill, category: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "#0E1624", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  >
+                    <option value="frontend">Frontend & UI</option>
+                    <option value="ai">AI & Intelligence</option>
+                    <option value="backend">Backend & Data</option>
+                    <option value="devops">DevOps & Cloud</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    HUD Code (e.g. AI-01 // CORE)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingSkill.code}
+                    onChange={(e) => setEditingSkill({ ...editingSkill, code: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Tagline / Description
+                  </label>
+                  <input
+                    type="text"
+                    value={editingSkill.tagline}
+                    onChange={(e) => setEditingSkill({ ...editingSkill, tagline: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Tags (Comma Separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={Array.isArray(editingSkill.tags) ? editingSkill.tags.join(", ") : editingSkill.tags}
+                    onChange={(e) => setEditingSkill({ ...editingSkill, tags: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2", display: "flex", gap: "10px", marginTop: "10px" }}>
+                  <button
+                    type="submit"
+                    className="font-pixel"
+                    style={{ backgroundColor: "#38BDF8", color: "#000", padding: "8px 18px", border: "none", borderRadius: "4px", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}
+                  >
+                    SAVE SKILL →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingSkill(null)}
+                    style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "#fff", padding: "8px 18px", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
+                  >
+                    CANCEL
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Skills Grid List */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
+            {skills.map((s) => (
+              <div
+                key={s.id}
+                style={{
+                  backgroundColor: "rgba(10, 16, 26, 0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "6px",
+                  padding: "18px 20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minHeight: "160px",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "1.1rem" }}>{s.name}</span>
+                    <span style={{ color: "#38BDF8", fontWeight: 700 }}>{s.level}%</span>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#9CA3AF", marginBottom: "6px" }}>
+                    {s.category.toUpperCase()} · {s.code}
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#D1D5DB", lineHeight: 1.4 }}>{s.tagline}</div>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "14px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                  <button
+                    onClick={() => setEditingSkill(s)}
+                    style={{ backgroundColor: "rgba(56, 189, 248, 0.15)", color: "#38BDF8", border: "1px solid #38BDF8", padding: "4px 10px", borderRadius: "3px", fontSize: "11px", cursor: "pointer" }}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSkill(s.id)}
+                    style={{ backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#EF4444", border: "1px solid #EF4444", padding: "4px 10px", borderRadius: "3px", fontSize: "11px", cursor: "pointer" }}
+                  >
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 3: PROJECTS ── */}
+      {activeTab === "projects" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div>
+              <h2 className="font-chakra" style={{ fontSize: "1.4rem", margin: "0 0 4px 0" }}>
+                FLAGSHIP PROJECTS &amp; MODELS
+              </h2>
+              <p style={{ color: "#9CA3AF", fontSize: "13px", margin: 0 }}>
+                Add and manage production systems, metrics, and architecture specs.
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                setEditingProject({
+                  id: "",
+                  title: "",
+                  codename: "SYS // CORE",
+                  category: "llm",
+                  tagline: "",
+                  description: "",
+                  architecture: "DAG pipeline\nVector memory\nContinuous batching",
+                  metrics: [
+                    { label: "Throughput", value: "300 tok/s" },
+                    { label: "Accuracy", value: "98%" },
+                    { label: "Latency", value: "< 20ms" },
+                  ],
+                  tags: "PyTorch, vLLM, FastAPI",
+                  github_url: "",
+                  live_url: "",
+                  featured: true,
+                })
+              }
+              className="font-pixel"
+              style={{
+                backgroundColor: "#38BDF8",
+                color: "#000000",
+                padding: "8px 16px",
+                borderRadius: "4px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                border: "none",
+              }}
+            >
+              + ADD NEW PROJECT
+            </button>
+          </div>
+
+          {/* Project Edit / Create Modal Form */}
+          {editingProject && (
+            <div
+              style={{
+                backgroundColor: "rgba(14, 22, 36, 0.95)",
+                border: "1px solid #38BDF8",
+                borderRadius: "6px",
+                padding: "24px",
+                marginBottom: "28px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.7)",
+              }}
+            >
+              <h3 className="font-chakra" style={{ fontSize: "1.2rem", marginBottom: "16px", color: "#38BDF8" }}>
+                {editingProject.id ? "EDIT PROJECT" : "CREATE NEW PROJECT"}
+              </h3>
+              <form onSubmit={handleSaveProject} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Project Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editingProject.title}
+                    onChange={(e) => setEditingProject({ ...editingProject, title: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Codename (e.g. SYS-01 // AGENTIC CORE)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingProject.codename}
+                    onChange={(e) => setEditingProject({ ...editingProject, codename: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Category
+                  </label>
+                  <select
+                    value={editingProject.category}
+                    onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "#0E1624", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  >
+                    <option value="llm">LLM & Agents</option>
+                    <option value="vision">Computer Vision</option>
+                    <option value="distributed">Distributed ML</option>
+                    <option value="fullstack">Full-Stack AI</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Live URL / GitHub URL
+                  </label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      placeholder="Live Demo URL"
+                      value={editingProject.live_url || ""}
+                      onChange={(e) => setEditingProject({ ...editingProject, live_url: e.target.value })}
+                      style={{ flex: 1, padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="GitHub URL"
+                      value={editingProject.github_url || ""}
+                      onChange={(e) => setEditingProject({ ...editingProject, github_url: e.target.value })}
+                      style={{ flex: 1, padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Tagline
+                  </label>
+                  <input
+                    type="text"
+                    value={editingProject.tagline}
+                    onChange={(e) => setEditingProject({ ...editingProject, tagline: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Architecture Highlights (One per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={Array.isArray(editingProject.architecture) ? editingProject.architecture.join("\n") : editingProject.architecture}
+                    onChange={(e) => setEditingProject({ ...editingProject, architecture: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2", display: "flex", gap: "10px", marginTop: "10px" }}>
+                  <button
+                    type="submit"
+                    className="font-pixel"
+                    style={{ backgroundColor: "#38BDF8", color: "#000", padding: "8px 18px", border: "none", borderRadius: "4px", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}
+                  >
+                    SAVE PROJECT →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingProject(null)}
+                    style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "#fff", padding: "8px 18px", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
+                  >
+                    CANCEL
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Projects Grid List */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "20px" }}>
+            {projects.map((p) => (
+              <div
+                key={p.id}
+                style={{
+                  backgroundColor: "rgba(10, 16, 26, 0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "6px",
+                  padding: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minHeight: "220px",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: "11px", color: "#38BDF8", marginBottom: "4px" }}>
+                    {p.codename} · {p.category?.toUpperCase()}
+                  </div>
+                  <h3 className="font-chakra" style={{ fontSize: "1.2rem", fontWeight: 700, margin: "0 0 8px 0" }}>
+                    {p.title}
+                  </h3>
+                  <p style={{ fontSize: "12px", color: "#9CA3AF", lineHeight: 1.4, margin: "0 0 12px 0" }}>
+                    {p.tagline}
+                  </p>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                  <button
+                    onClick={() => setEditingProject(p)}
+                    style={{ backgroundColor: "rgba(56, 189, 248, 0.15)", color: "#38BDF8", border: "1px solid #38BDF8", padding: "4px 10px", borderRadius: "3px", fontSize: "11px", cursor: "pointer" }}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProject(p.id)}
+                    style={{ backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#EF4444", border: "1px solid #EF4444", padding: "4px 10px", borderRadius: "3px", fontSize: "11px", cursor: "pointer" }}
+                  >
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 4: EXPERIENCES ── */}
+      {activeTab === "experiences" && (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div>
+              <h2 className="font-chakra" style={{ fontSize: "1.4rem", margin: "0 0 4px 0" }}>
+                CAREER &amp; RESEARCH MILESTONES
+              </h2>
+              <p style={{ color: "#9CA3AF", fontSize: "13px", margin: 0 }}>
+                Manage work history, engineering breakthroughs, and toolchains.
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                setEditingExp({
+                  id: "",
+                  role: "Staff / Lead ML Engineer",
+                  company: "Autonomous AI Labs",
+                  location: "Vancouver, BC / Remote",
+                  period: "2024 — PRESENT",
+                  badge: "ACTIVE DEPLOYMENT",
+                  overview: "Spearheading multi-modal agentic systems and inference optimization.",
+                  achievements: "Engineered autonomous agent swarm\nQuantized Llama 3 models\nReduced cloud compute by 60%",
+                  technologies: "PyTorch, vLLM, LangChain, Docker",
+                })
+              }
+              className="font-pixel"
+              style={{
+                backgroundColor: "#38BDF8",
+                color: "#000000",
+                padding: "8px 16px",
+                borderRadius: "4px",
+                fontSize: "11px",
+                fontWeight: 700,
+                cursor: "pointer",
+                border: "none",
+              }}
+            >
+              + ADD NEW ROLE
+            </button>
+          </div>
+
+          {/* Experience Edit / Create Modal Form */}
+          {editingExp && (
+            <div
+              style={{
+                backgroundColor: "rgba(14, 22, 36, 0.95)",
+                border: "1px solid #38BDF8",
+                borderRadius: "6px",
+                padding: "24px",
+                marginBottom: "28px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.7)",
+              }}
+            >
+              <h3 className="font-chakra" style={{ fontSize: "1.2rem", marginBottom: "16px", color: "#38BDF8" }}>
+                {editingExp.id ? "EDIT ROLE" : "CREATE NEW ROLE"}
+              </h3>
+              <form onSubmit={handleSaveExperience} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Role Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editingExp.role}
+                    onChange={(e) => setEditingExp({ ...editingExp, role: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Company &amp; Location
+                  </label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      placeholder="Company"
+                      value={editingExp.company}
+                      onChange={(e) => setEditingExp({ ...editingExp, company: e.target.value })}
+                      style={{ flex: 1, padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Location"
+                      value={editingExp.location}
+                      onChange={(e) => setEditingExp({ ...editingExp, location: e.target.value })}
+                      style={{ flex: 1, padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Period (e.g. 2024 — PRESENT)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingExp.period}
+                    onChange={(e) => setEditingExp({ ...editingExp, period: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Badge (e.g. ACTIVE DEPLOYMENT)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingExp.badge}
+                    onChange={(e) => setEditingExp({ ...editingExp, badge: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Role Overview
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={editingExp.overview}
+                    onChange={(e) => setEditingExp({ ...editingExp, overview: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: "11px", color: "#9CA3AF", display: "block", marginBottom: "4px" }}>
+                    Breakthrough Achievements (One per line)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={Array.isArray(editingExp.achievements) ? editingExp.achievements.join("\n") : editingExp.achievements}
+                    onChange={(e) => setEditingExp({ ...editingExp, achievements: e.target.value })}
+                    style={{ width: "100%", padding: "8px 12px", backgroundColor: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", borderRadius: "4px" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "span 2", display: "flex", gap: "10px", marginTop: "10px" }}>
+                  <button
+                    type="submit"
+                    className="font-pixel"
+                    style={{ backgroundColor: "#38BDF8", color: "#000", padding: "8px 18px", border: "none", borderRadius: "4px", fontWeight: 700, cursor: "pointer", fontSize: "11px" }}
+                  >
+                    SAVE ROLE →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingExp(null)}
+                    style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "#fff", padding: "8px 18px", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
+                  >
+                    CANCEL
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Experiences List */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {experiences.map((exp) => (
+              <div
+                key={exp.id}
+                style={{
+                  backgroundColor: "rgba(10, 16, 26, 0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "6px",
+                  padding: "20px 24px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  flexWrap: "wrap",
+                  gap: "16px",
+                }}
+              >
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+                    <h3 className="font-chakra" style={{ fontSize: "1.25rem", fontWeight: 700, margin: 0 }}>
+                      {exp.role}
+                    </h3>
+                    <span style={{ fontSize: "10px", color: "#38BDF8", backgroundColor: "rgba(56, 189, 248, 0.1)", padding: "2px 6px", borderRadius: "2px" }}>
+                      {exp.badge}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#9CA3AF", marginBottom: "6px" }}>
+                    {exp.company} · {exp.location} · {exp.period}
+                  </div>
+                  <div style={{ fontSize: "13px", color: "#D1D5DB" }}>{exp.overview}</div>
+                </div>
+
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <button
+                    onClick={() => setEditingExp(exp)}
+                    style={{ backgroundColor: "rgba(56, 189, 248, 0.15)", color: "#38BDF8", border: "1px solid #38BDF8", padding: "4px 10px", borderRadius: "3px", fontSize: "11px", cursor: "pointer" }}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    onClick={() => handleDeleteExperience(exp.id)}
+                    style={{ backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#EF4444", border: "1px solid #EF4444", padding: "4px 10px", borderRadius: "3px", fontSize: "11px", cursor: "pointer" }}
+                  >
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 5: INBOX ── */}
       {activeTab === "inquiries" && (
         <div
           style={{
@@ -591,126 +1364,6 @@ export default function AdminPage() {
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Tab Content: Skills Matrix */}
-      {activeTab === "skills" && (
-        <div
-          style={{
-            backgroundColor: "rgba(10, 16, 26, 0.8)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            borderRadius: "6px",
-            padding: "32px",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-            <h2 className="font-chakra" style={{ fontSize: "1.4rem", margin: 0 }}>
-              TECHNICAL ARSENAL MANAGEMENT
-            </h2>
-          </div>
-          <p style={{ color: "#9CA3AF", fontSize: "13px", marginBottom: "20px" }}>
-            Manage skills, proficiency percentages, and category groupings stored in Neon Database.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" }}>
-            {skills.map((s) => (
-              <div
-                key={s.id}
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "4px",
-                  padding: "16px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                  <span style={{ fontWeight: 700, color: "#ffffff" }}>{s.name}</span>
-                  <span style={{ color: "#38BDF8", fontWeight: 700 }}>{s.level}%</span>
-                </div>
-                <div style={{ fontSize: "11px", color: "#9CA3AF", marginBottom: "8px" }}>
-                  {s.category} · {s.code}
-                </div>
-                <div style={{ fontSize: "12px", color: "#D1D5DB" }}>{s.tagline}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Tab Content: Projects */}
-      {activeTab === "projects" && (
-        <div
-          style={{
-            backgroundColor: "rgba(10, 16, 26, 0.8)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            borderRadius: "6px",
-            padding: "32px",
-          }}
-        >
-          <h2 className="font-chakra" style={{ fontSize: "1.4rem", marginBottom: "16px" }}>
-            FLAGSHIP PROJECTS &amp; MODELS
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "16px" }}>
-            {projects.map((p) => (
-              <div
-                key={p.id}
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "4px",
-                  padding: "18px",
-                }}
-              >
-                <div style={{ fontWeight: 700, color: "#ffffff", fontSize: "1.1rem", marginBottom: "4px" }}>
-                  {p.title}
-                </div>
-                <div style={{ fontSize: "11px", color: "#38BDF8", marginBottom: "8px" }}>
-                  {p.codename} · {p.category}
-                </div>
-                <div style={{ fontSize: "12px", color: "#D1D5DB" }}>{p.tagline}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Tab Content: Experiences */}
-      {activeTab === "experiences" && (
-        <div
-          style={{
-            backgroundColor: "rgba(10, 16, 26, 0.8)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            borderRadius: "6px",
-            padding: "32px",
-          }}
-        >
-          <h2 className="font-chakra" style={{ fontSize: "1.4rem", marginBottom: "16px" }}>
-            CAREER &amp; RESEARCH MILESTONES
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {experiences.map((exp) => (
-              <div
-                key={exp.id}
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "4px",
-                  padding: "18px 20px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontWeight: 700, color: "#ffffff", fontSize: "1.1rem" }}>
-                    {exp.role}
-                  </span>
-                  <span style={{ fontSize: "11px", color: "#C4B5FD" }}>{exp.period}</span>
-                </div>
-                <div style={{ fontSize: "12px", color: "#9CA3AF", margin: "4px 0 8px 0" }}>
-                  {exp.company} · {exp.location}
-                </div>
-                <div style={{ fontSize: "13px", color: "#D1D5DB" }}>{exp.overview}</div>
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </div>
