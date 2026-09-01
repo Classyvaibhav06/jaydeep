@@ -18,7 +18,7 @@
   font-family: var(--font-inter), sans-serif;
 }
 
-/* ── Chamfered Tech Button (Exact WASP style cut corner) ── */
+/* ── Chamfered Tech Button (Exact WASP cut corner) ── */
 .chamfer-btn {
   clip-path: polygon(
     0 0,
@@ -29,10 +29,6 @@
   );
   position: relative;
   transition: all 0.2s ease;
-}
-
-.chamfer-btn:hover {
-  filter: brightness(1.2);
 }
 
 .chamfer-btn:active {
@@ -51,8 +47,8 @@
 html,
 body {
   height: 100%;
-  background-color: #E5E7EB;
-  color: #111827;
+  background-color: #000000;
+  color: #ffffff;
   scroll-behavior: smooth;
 }
 
@@ -61,9 +57,9 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #E5E7EB;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #9CA3AF;
+  background: #333333;
   border-radius: 3px;
 }
