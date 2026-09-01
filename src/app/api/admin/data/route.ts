@@ -49,10 +49,14 @@ export async function POST(req: Request) {
     const { action, data, id } = body;
 
     if (action === "update_config") {
+      const darkOp = parseFloat(data.video_opacity_dark) ?? 1.0;
+      const lightOp = parseFloat(data.video_opacity_light) ?? 0.9;
+
       await sql`
         INSERT INTO portfolio_config (
           id, headline, subheadline, cta_text, cta_link,
-          stat1_value, stat1_label, stat2_value, stat2_label, updated_at
+          stat1_value, stat1_label, stat2_value, stat2_label,
+          video_opacity_dark, video_opacity_light, updated_at
         ) VALUES (
           'main',
           ${data.headline},
@@ -63,6 +67,8 @@ export async function POST(req: Request) {
           ${data.stat1_label},
           ${data.stat2_value},
           ${data.stat2_label},
+          ${darkOp},
+          ${lightOp},
           NOW()
         )
         ON CONFLICT (id) DO UPDATE SET
@@ -74,6 +80,8 @@ export async function POST(req: Request) {
           stat1_label = EXCLUDED.stat1_label,
           stat2_value = EXCLUDED.stat2_value,
           stat2_label = EXCLUDED.stat2_label,
+          video_opacity_dark = EXCLUDED.video_opacity_dark,
+          video_opacity_light = EXCLUDED.video_opacity_light,
           updated_at = NOW();
       `;
       return NextResponse.json({ success: true });

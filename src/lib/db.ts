@@ -22,8 +22,12 @@ export async function initDb() {
       stat1_label VARCHAR(100) NOT NULL,
       stat2_value VARCHAR(50) NOT NULL,
       stat2_label VARCHAR(100) NOT NULL,
+      video_opacity_dark NUMERIC DEFAULT 1.0,
+      video_opacity_light NUMERIC DEFAULT 0.9,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+    ALTER TABLE portfolio_config ADD COLUMN IF NOT EXISTS video_opacity_dark NUMERIC DEFAULT 1.0;
+    ALTER TABLE portfolio_config ADD COLUMN IF NOT EXISTS video_opacity_light NUMERIC DEFAULT 0.9;
   `;
 
   await sql`

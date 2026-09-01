@@ -12,6 +12,49 @@ export default function HeroSection() {
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [videoSrcError, setVideoSrcError] = useState(false);
 
+  // Dynamic portfolio config
+  const [config, setConfig] = useState({
+    headline: "MACHINE LEARNING & AI SYSTEMS",
+    subheadline:
+      "Architecting high-throughput neural models, autonomous LLM pipelines, and ultra-low-latency distributed inference engines.",
+    cta_text: "EXPLORE MODELS",
+    cta_link: "#skills",
+    stat1_value: "25M+",
+    stat1_label: "Daily Inferences",
+    stat2_value: "< 38ms",
+    stat2_label: "P99 Inference Latency",
+    video_opacity_dark: 1.0,
+    video_opacity_light: 0.9,
+  });
+
+  const [showTuner, setShowTuner] = useState(false);
+  const [tunerOpacity, setTunerOpacity] = useState<number>(1.0);
+
+  // Fetch dynamic config on mount
+  useEffect(() => {
+    fetch("/api/portfolio")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.config) {
+          setConfig(data.config);
+          setTunerOpacity(
+            isDark
+              ? parseFloat(data.config.video_opacity_dark ?? 1.0)
+              : parseFloat(data.config.video_opacity_light ?? 0.9)
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setTunerOpacity(
+      isDark
+        ? parseFloat(String(config.video_opacity_dark ?? 1.0))
+        : parseFloat(String(config.video_opacity_light ?? 0.9))
+    );
+  }, [isDark, config]);
+
   useEffect(() => {
     setVideoSrcError(false);
     if (desktopVideoRef.current) {
@@ -24,11 +67,13 @@ export default function HeroSection() {
     }
   }, [theme]);
 
-  // Video sources (uses /light.mp4 in light mode, /desktop.mp4 / /bcck.mp4 in dark mode)
+  // Video sources
   const desktopSrc =
     !isDark && !videoSrcError ? "/light.mp4" : "/desktop.mp4";
   const mobileSrc =
     !isDark && !videoSrcError ? "/light.mp4" : "/bcck.mp4";
+
+  const currentOpacity = tunerOpacity;
 
   return (
     <section
@@ -69,8 +114,9 @@ export default function HeroSection() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            opacity: currentOpacity,
             filter: isDark ? "none" : "brightness(1.05) contrast(0.95)",
-            transition: "filter 0.4s ease",
+            transition: "opacity 0.2s ease, filter 0.4s ease",
           }}
           src={desktopSrc}
           autoPlay
@@ -79,7 +125,6 @@ export default function HeroSection() {
           playsInline
           preload="auto"
           onError={() => {
-            // Graceful fallback to dark video if light video asset is not yet added
             if (!isDark) setVideoSrcError(true);
           }}
         />
@@ -95,8 +140,9 @@ export default function HeroSection() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            opacity: currentOpacity,
             filter: isDark ? "none" : "brightness(1.05) contrast(0.95)",
-            transition: "filter 0.4s ease",
+            transition: "opacity 0.2s ease, filter 0.4s ease",
           }}
           src={mobileSrc}
           autoPlay
@@ -183,184 +229,307 @@ export default function HeroSection() {
               textTransform: "uppercase",
               margin: "0 0 18px 0",
               textShadow: isDark
-                ? "0 2px 10px rgba(0,0,0,0.5)"
+                ? "0 4px 24px rgba(0,0,0,0.8)"
                 : "0 2px 10px rgba(255,255,255,0.8)",
             }}
           >
-            <span style={{ display: "block" }}>MACHINE LEARNING</span>
-            <span style={{ display: "block" }}>&amp; AI SYSTEMS</span>
+            {config.headline || "MACHINE LEARNING & AI SYSTEMS"}
           </h1>
 
-          {/* Subtitle */}
+          {/* Descriptive Subtitle */}
           <p
             style={{
               color: "var(--text-secondary)",
-              fontSize: "0.95rem",
-              lineHeight: 1.6,
-              maxWidth: "420px",
-              margin: "0 0 32px 0",
+              fontSize: "clamp(0.95rem, 1.2vw, 1.05rem)",
+              lineHeight: 1.5,
               fontWeight: 400,
+              margin: "0 0 32px 0",
+              maxWidth: "520px",
+              textShadow: isDark
+                ? "0 2px 10px rgba(0,0,0,0.9)"
+                : "0 1px 4px rgba(255,255,255,0.6)",
             }}
           >
-            Architecting high-throughput neural models, autonomous LLM pipelines,
-            and ultra-low-latency distributed inference engines.
+            {config.subheadline ||
+              "Architecting high-throughput neural models, autonomous LLM pipelines, and ultra-low-latency distributed inference engines."}
           </p>
 
-          {/* Calibrated 45-Degree Cut Button */}
-          <div style={{ marginBottom: "40px" }}>
-            <WaspButton
-              href="#skills"
-              id="hero-start-now-btn"
-              variant={isDark ? "dark" : "light"}
-            >
-              EXPLORE MODELS
+          {/* Primary Action Button */}
+          <div style={{ marginBottom: "16px" }}>
+            <WaspButton href={config.cta_link || "#skills"} variant={isDark ? "dark" : "light"}>
+              {config.cta_text || "EXPLORE MODELS"}
             </WaspButton>
-          </div>
-
-          {/* Wireframe Stats Section */}
-          <div
-            style={{
-              paddingTop: "24px",
-              borderTop: "1px solid var(--border-subtle)",
-              display: "flex",
-              alignItems: "center",
-              gap: "42px",
-              maxWidth: "460px",
-            }}
-          >
-            {/* Stat 1: Daily Inferences / Token Throughput */}
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--text-secondary)",
-                  flexShrink: 0,
-                }}
-              >
-                <svg
-                  style={{ width: "26px", height: "26px" }}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="7" r="2.5" />
-                  <path d="M5 17L12 13L19 17L12 21L5 17Z" />
-                  <path d="M5 12L12 16L19 12" />
-                </svg>
-              </div>
-              <div>
-                <div
-                  className="font-chakra"
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "1.6rem",
-                    color: "var(--text-primary)",
-                    lineHeight: 1,
-                  }}
-                >
-                  25M+
-                </div>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "var(--text-muted)",
-                    marginTop: "4px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  Daily Inferences
-                </div>
-              </div>
-            </div>
-
-            {/* Vertical Divider */}
-            <div
-              style={{
-                height: "36px",
-                width: "1px",
-                backgroundColor: "var(--border-subtle)",
-              }}
-            />
-
-            {/* Stat 2: Latency Benchmark */}
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--text-secondary)",
-                  flexShrink: 0,
-                }}
-              >
-                <svg
-                  style={{ width: "26px", height: "26px" }}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-                  <line x1="12" y1="2" x2="12" y2="22" />
-                  <line x1="2" y1="8.5" x2="22" y2="8.5" />
-                  <line x1="2" y1="15.5" x2="22" y2="15.5" />
-                </svg>
-              </div>
-              <div>
-                <div
-                  className="font-chakra"
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "1.6rem",
-                    color: "var(--text-primary)",
-                    lineHeight: 1,
-                  }}
-                >
-                  &lt; 38ms
-                </div>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "var(--text-muted)",
-                    marginTop: "4px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  P99 Inference Latency
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>
 
-      {/* ── BOTTOM GRADIENT VIGNETTE ── */}
-      <div
+      {/* ── BOTTOM HUD STATS & QUICK OPACITY TUNER ── */}
+      <footer
         style={{
           position: "relative",
           zIndex: 20,
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          padding: "0 56px 40px 56px",
+          maxWidth: "1480px",
           width: "100%",
-          height: "64px",
-          background: isDark
-            ? "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.2) 60%, transparent)"
-            : "linear-gradient(to top, rgba(248,250,252,0.9), rgba(248,250,252,0.3) 60%, transparent)",
-          pointerEvents: "none",
-          flexShrink: 0,
+          margin: "0 auto",
         }}
-      />
+      >
+        {/* Telemetry Stats Group */}
+        <div style={{ display: "flex", alignItems: "center", gap: "48px" }}>
+          {/* Stat 1 */}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              style={{
+                color: isDark ? "rgba(255,255,255,0.85)" : "#0F172A",
+                flexShrink: 0,
+              }}
+            >
+              <polygon points="12 2 2 7 12 12 22 7 12 2" />
+              <polyline points="2 17 12 22 22 17" />
+              <polyline points="2 12 12 17 22 12" />
+            </svg>
+            <div>
+              <div
+                className="font-chakra"
+                style={{
+                  fontWeight: 700,
+                  fontSize: "clamp(1.4rem, 2.2vw, 1.85rem)",
+                  lineHeight: 1,
+                  letterSpacing: "-0.01em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                {config.stat1_value || "25M+"}
+              </div>
+              <div
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "var(--text-muted)",
+                  marginTop: "4px",
+                }}
+              >
+                {config.stat1_label || "DAILY INFERENCES"}
+              </div>
+            </div>
+          </div>
+
+          {/* Thin Vertical Separator */}
+          <div
+            style={{
+              width: "1px",
+              height: "36px",
+              backgroundColor: isDark
+                ? "rgba(255, 255, 255, 0.15)"
+                : "rgba(0, 0, 0, 0.15)",
+            }}
+          />
+
+          {/* Stat 2 */}
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              style={{
+                color: isDark ? "rgba(255,255,255,0.85)" : "#0F172A",
+                flexShrink: 0,
+              }}
+            >
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+              <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+            <div>
+              <div
+                className="font-chakra"
+                style={{
+                  fontWeight: 700,
+                  fontSize: "clamp(1.4rem, 2.2vw, 1.85rem)",
+                  lineHeight: 1,
+                  letterSpacing: "-0.01em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                {config.stat2_value || "< 38ms"}
+              </div>
+              <div
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "var(--text-muted)",
+                  marginTop: "4px",
+                }}
+              >
+                {config.stat2_label || "P99 INFERENCE LATENCY"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Interactive HUD Opacity Tuner Widget ── */}
+        <div style={{ position: "relative" }}>
+          {showTuner && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "48px",
+                right: "0",
+                width: "260px",
+                backgroundColor: isDark
+                  ? "rgba(10, 16, 26, 0.95)"
+                  : "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(16px)",
+                border: isDark
+                  ? "1px solid rgba(56, 189, 248, 0.4)"
+                  : "1px solid rgba(15, 23, 42, 0.2)",
+                padding: "16px",
+                borderRadius: "6px",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                zIndex: 40,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <span
+                  className="font-pixel"
+                  style={{
+                    fontSize: "10px",
+                    color: isDark ? "#38BDF8" : "#0284C7",
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  // VIDEO OPACITY
+                </span>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    color: isDark ? "#ffffff" : "#0F172A",
+                  }}
+                >
+                  {Math.round(currentOpacity * 100)}%
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="0.05"
+                max="1.0"
+                step="0.05"
+                value={currentOpacity}
+                onChange={(e) => {
+                  const val = parseFloat(e.target.value);
+                  setTunerOpacity(val);
+                  if (isDark) {
+                    setConfig((prev) => ({ ...prev, video_opacity_dark: val }));
+                  } else {
+                    setConfig((prev) => ({ ...prev, video_opacity_light: val }));
+                  }
+                }}
+                style={{
+                  width: "100%",
+                  accentColor: isDark ? "#38BDF8" : "#0284C7",
+                  cursor: "pointer",
+                }}
+              />
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: "9px",
+                  color: isDark ? "#94A3B8" : "#64748B",
+                  marginTop: "4px",
+                }}
+              >
+                <span>5% (Subtle)</span>
+                <span>100% (Vivid)</span>
+              </div>
+
+              <div style={{ marginTop: "12px", display: "flex", gap: "6px" }}>
+                <a
+                  href="/admin"
+                  target="_blank"
+                  className="font-pixel"
+                  style={{
+                    flex: 1,
+                    textAlign: "center",
+                    backgroundColor: isDark
+                      ? "rgba(56, 189, 248, 0.15)"
+                      : "rgba(2, 132, 199, 0.1)",
+                    color: isDark ? "#38BDF8" : "#0284C7",
+                    border: isDark
+                      ? "1px solid #38BDF8"
+                      : "1px solid #0284C7",
+                    padding: "5px 8px",
+                    borderRadius: "3px",
+                    fontSize: "9px",
+                    textDecoration: "none",
+                    fontWeight: 700,
+                  }}
+                >
+                  ADMIN PANEL ↗
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Trigger Button */}
+          <button
+            onClick={() => setShowTuner(!showTuner)}
+            title="Adjust Background Video Opacity"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              backgroundColor: isDark
+                ? "rgba(10, 16, 26, 0.8)"
+                : "rgba(255, 255, 255, 0.8)",
+              backdropFilter: "blur(10px)",
+              border: isDark
+                ? "1px solid rgba(255, 255, 255, 0.15)"
+                : "1px solid rgba(0, 0, 0, 0.15)",
+              color: isDark ? "#ffffff" : "#0F172A",
+              padding: "7px 14px",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "11px",
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <span style={{ fontSize: "12px" }}>🎥</span>
+            <span>OPACITY: {Math.round(currentOpacity * 100)}%</span>
+            <span style={{ fontSize: "9px", opacity: 0.6 }}>
+              {showTuner ? "▲" : "▼"}
+            </span>
+          </button>
+        </div>
+      </footer>
     </section>
   );
 }

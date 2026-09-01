@@ -24,6 +24,8 @@ export default function AdminPage() {
     stat1_label: "Daily Inferences",
     stat2_value: "< 38ms",
     stat2_label: "P99 Inference Latency",
+    video_opacity_dark: 1.0,
+    video_opacity_light: 0.9,
   });
 
   const [skills, setSkills] = useState<any[]>([]);
@@ -648,6 +650,84 @@ export default function AdminPage() {
                     borderRadius: "4px",
                   }}
                 />
+              </div>
+            </div>
+
+            {/* ── Background Video Opacity Controls ── */}
+            <div
+              style={{
+                backgroundColor: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(56, 189, 248, 0.2)",
+                borderRadius: "6px",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "18px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span className="font-chakra" style={{ fontSize: "1rem", color: "#38BDF8", fontWeight: 700 }}>
+                  🎥 HERO BACKGROUND VIDEO OPACITY
+                </span>
+                <span style={{ fontSize: "10px", color: "#9CA3AF" }}>
+                  REAL-TIME CONTROLS
+                </span>
+              </div>
+
+              {/* Dark Mode Video Opacity */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                  <label style={{ fontSize: "11px", color: "#E2E8F0", fontWeight: 600 }}>
+                    🌙 Dark Mode Video Opacity
+                  </label>
+                  <span style={{ fontSize: "12px", color: "#38BDF8", fontWeight: 700 }}>
+                    {Math.round((Number(config.video_opacity_dark) ?? 1) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.05"
+                  max="1.0"
+                  step="0.05"
+                  value={config.video_opacity_dark ?? 1.0}
+                  onChange={(e) =>
+                    setConfig({ ...config, video_opacity_dark: parseFloat(e.target.value) })
+                  }
+                  style={{ width: "100%", accentColor: "#38BDF8", cursor: "pointer" }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px", color: "#64748B", marginTop: "2px" }}>
+                  <span>5% (Subtle / Dark)</span>
+                  <span>50%</span>
+                  <span>100% (Full Brightness)</span>
+                </div>
+              </div>
+
+              {/* Light Mode Video Opacity */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                  <label style={{ fontSize: "11px", color: "#E2E8F0", fontWeight: 600 }}>
+                    ☀️ Light Mode Video Opacity
+                  </label>
+                  <span style={{ fontSize: "12px", color: "#38BDF8", fontWeight: 700 }}>
+                    {Math.round((Number(config.video_opacity_light) ?? 0.9) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0.05"
+                  max="1.0"
+                  step="0.05"
+                  value={config.video_opacity_light ?? 0.9}
+                  onChange={(e) =>
+                    setConfig({ ...config, video_opacity_light: parseFloat(e.target.value) })
+                  }
+                  style={{ width: "100%", accentColor: "#38BDF8", cursor: "pointer" }}
+                />
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px", color: "#64748B", marginTop: "2px" }}>
+                  <span>5% (Light Tint)</span>
+                  <span>50%</span>
+                  <span>100% (Crisp Clear)</span>
+                </div>
               </div>
             </div>
 
