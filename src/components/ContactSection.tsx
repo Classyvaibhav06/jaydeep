@@ -74,8 +74,17 @@ export default function ContactSection() {
     setTerminalInput("");
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState),
+      });
+    } catch (err) {
+      console.error("Failed to transmit inquiry", err);
+    }
     setIsSubmitted(true);
   };
 
