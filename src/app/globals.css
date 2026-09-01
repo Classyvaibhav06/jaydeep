@@ -1,10 +1,45 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-space-grotesk);
+  --font-chakra: var(--font-chakra);
+  --font-pixel: var(--font-pixel);
+  --font-inter: var(--font-inter);
 }
 
-/* ─── Reset & Base ─── */
+.font-chakra {
+  font-family: var(--font-chakra), sans-serif;
+}
+
+.font-pixel {
+  font-family: var(--font-pixel), monospace;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* ── Chamfered Tech Button (Exact WASP style cut corner) ── */
+.chamfer-btn {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    0 100%
+  );
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.chamfer-btn:hover {
+  filter: brightness(1.2);
+}
+
+.chamfer-btn:active {
+  transform: translateY(1px);
+}
+
+/* ── Reset & Clean Defaults ── */
 *,
 *::before,
 *::after {
@@ -16,154 +51,19 @@
 html,
 body {
   height: 100%;
+  background-color: #E5E7EB;
+  color: #111827;
   scroll-behavior: smooth;
 }
 
-body {
-  background: #000;
-  color: #fff;
-  font-family: var(--font-space-grotesk, "Space Grotesk", system-ui, sans-serif);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-/* ─── Scrollbar ─── */
+/* ── Custom Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #E5E7EB;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 2px;
-}
-
-/* ─── Selection ─── */
-::selection {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-}
-
-/* ─── Hero video overlay ─── */
-.hero-video-overlay {
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.35) 0%,
-    rgba(0, 0, 0, 0.2) 40%,
-    rgba(0, 0, 0, 0.6) 75%,
-    rgba(0, 0, 0, 1) 100%
-  );
-}
-
-/* ─── Clip paths ─── */
-.clip-chevron {
-  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%);
-}
-
-/* ─── Noise grain texture ─── */
-.noise::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  opacity: 0.04;
-  z-index: 1;
-}
-
-/* ─── Glow text ─── */
-.text-glow {
-  text-shadow: 0 0 80px rgba(255, 255, 255, 0.15);
-}
-
-/* ─── Stat divider ─── */
-.stat-divider {
-  width: 1px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
-  height: 40px;
-  align-self: center;
-}
-
-/* ─── Animated underline ─── */
-.hover-underline {
-  position: relative;
-}
-.hover-underline::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: #fff;
-  transition: width 0.3s ease;
-}
-.hover-underline:hover::after {
-  width: 100%;
-}
-
-/* ─── CTA button shimmer ─── */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
-}
-
-.btn-shimmer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.15),
-    transparent
-  );
-  transform: translateX(-100%);
-  transition: none;
-}
-
-.btn-shimmer:hover::before {
-  animation: shimmer 0.6s ease forwards;
-}
-
-/* ─── Fade-in animations ─── */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.animate-fade-up {
-  animation: fadeUp 0.8s ease forwards;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s ease forwards;
-}
-
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-500 { animation-delay: 0.5s; }
-.delay-600 { animation-delay: 0.6s; }
-.delay-700 { animation-delay: 0.7s; }
-
-.opacity-0-start {
-  opacity: 0;
+  background: #9CA3AF;
+  border-radius: 3px;
 }

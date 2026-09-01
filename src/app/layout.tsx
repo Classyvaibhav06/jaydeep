@@ -1,24 +1,41 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Chakra_Petch, Silkscreen, Inter } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const chakraPetch = Chakra_Petch({
+  variable: "--font-chakra",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const silkscreen = Silkscreen({
+  variable: "--font-pixel",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+});
+
 export const metadata: Metadata = {
-  title: "Jaydeep — Full Stack Developer",
-  description:
-    "Portfolio of Jaydeep — a passionate full-stack developer building innovative digital experiences with cutting-edge technology.",
-  keywords: ["developer", "portfolio", "full-stack", "react", "next.js"],
+  title: "JAYDEEP — Full Stack Developer",
+  description: "AI-driven solutions and cutting-edge digital experiences.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-black text-white antialiased">
+    <html
+      lang="en"
+      className={`${chakraPetch.variable} ${silkscreen.variable} ${inter.variable} h-full`}
+    >
+      <body className="min-h-full antialiased selection:bg-black selection:text-white">
         {children}
       </body>
     </html>

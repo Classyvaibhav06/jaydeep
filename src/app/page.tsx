@@ -2,18 +2,8 @@ import HeroSection from "@/components/HeroSection";
 
 export default function Home() {
   return (
-    <main>
+    <main className="w-full min-h-screen bg-[#E5E7EB]">
       <HeroSection />
-
-      {/* More sections coming soon */}
-      <section
-        id="about"
-        className="min-h-screen bg-black flex items-center justify-center"
-      >
-        <p className="text-white/20 text-sm tracking-widest uppercase">
-          — more sections coming —
-        </p>
-      </section>
     </main>
   );
 }
